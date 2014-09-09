@@ -1,0 +1,117 @@
+<html>
+<head>
+<title>Memory</title>
+<style type="text/css">
+	#memory td {
+		cursor: pointer;
+		font-size: 100px;
+		font-family: courier new;
+	}
+</style>
+</head>
+<body>
+
+<table id="memory">
+	<tr>
+		<td>X</td>
+		<td>X</td>
+		<td>X</td>
+		<td>X</td>
+	</tr>
+	<tr>
+		<td>X</td>
+		<td>X</td>
+		<td>X</td>
+		<td>X</td>
+	</tr>
+	<tr>
+		<td>X</td>
+		<td>X</td>
+		<td>X</td>
+		<td>X</td>
+	</tr>
+	<tr>
+		<td>X</td>
+		<td>X</td>
+		<td>X</td>
+		<td>X</td>
+	</tr>
+</table>
+
+<button name="start" id="start">DEAL</button>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script type="text/javascript">
+var memory = {
+	symbols: [0,1,2,3,4,5,6,7],  // card symbols
+	set: [[],[],[],[]],       // contains the table top "dealed"
+	prev: {
+		col: null,
+		row: null,
+	},
+
+	init: function() {
+		this.setupEvents();
+		this.deal();
+	},
+	deal: function() {
+		cards = this.symbols.concat(this.symbols);
+
+		// Anti sort with sort :)
+		cards.sort(function(a,b) {
+			return Math.floor(Math.random() * (2 - 0 + 1)) + -1;
+		});
+
+		var that = this;
+		cards.forEach(function(card,i) {
+			that.set[i%4].push(card);
+		});
+
+	},
+	setupEvents: function() {
+		var that = this;
+
+		$('#memory td').on('click', function() {
+			var rowNum = $(this).parent().siblings().andSelf().index($(this).parent());
+			var colNum = $(this).siblings().andSelf().index($(this));
+
+			$(this).html(that.set[rowNum][colNum]);
+			$(this).toggleClass('flipped');
+
+			if ($('#memory .flipped').length === 2) {
+				
+				if (that.set[rowNum][colNum] === that.set[that.prev.row][that.prev.col]) { 
+					
+					$('#memory tr:eq('+ rowNum +') td:eq('+ colNum +')').toggleClass('flipped').addClass('matched');
+					$('#memory tr:eq('+ that.prev.row +') td:eq('+ that.prev.col +')').toggleClass('flipped').addClass('matched');
+				} else {
+					setTimeout(that.resetNonMatched, 1000);
+				}
+			}
+
+			that.prev.col = colNum;
+			that.prev.row = rowNum;
+
+
+		});
+
+		$('#start').on('click', function() {
+			that.deal();
+		});
+	},
+	resetNonMatched: function() {
+		$('.flipped').html('X');
+		$('.flipped').toggleClass('flipped');
+	}
+
+};
+
+
+memory.init();
+
+
+
+
+</script>
+</body>
+</html>
